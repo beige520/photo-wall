@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>红梅与贝 - 照片墙</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            overflow-x: hidden;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        .header {
+            text-align: center;
+            padding: 60px 20px 40px;
+            position: relative;
+        }
+        .header h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient-shift 3s ease infinite;
+            background-size: 300% 300%;
+            text-shadow: 0 0 30px rgba(255, 107, 107, 0.3);
+        }
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2rem;
+            margin-top: 15px;
+            letter-spacing: 3px;
+        }
+        .particles {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; overflow: hidden; z-index: 0;
+        }
+        .particle {
+            position: absolute; width: 6px; height: 6px;
+            background: rgba(255, 255, 255, 0.3); border-radius: 50%;
+            animation: float 15s infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+        .gallery-container {
+            max-width: 1400px; margin: 0 auto; padding: 20px; position: relative; z-index: 1;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            perspective: 1000px;
+        }
+        .photo-card {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeInUp 0.8s ease forwards;
+            opacity: 0;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(50px) rotateX(10deg); }
+            to { opacity: 1; transform: translateY(0) rotateX(0); }
+        }
+        .photo-card:nth-child(1) { animation-delay: 0.1s; }
+        .photo-card:nth-child(2) { animation-delay: 0.15s; }
+        .photo-card:nth-child(3) { animation-delay: 0.2s; }
+        .photo-card:nth-child(4) { animation-delay: 0.25s; }
+        .photo-card:nth-child(5) { animation-delay: 0.3s; }
+        .photo-card:nth-child(6) { animation-delay: 0.35s; }
+        .photo-card:nth-child(7) { animation-delay: 0.4s; }
+        .photo-card:nth-child(8) { animation-delay: 0.45s; }
+        .photo-card:nth-child(9) { animation-delay: 0.5s; }
+        .photo-card:nth-child(10) { animation-delay: 0.55s; }
+        .photo-card:nth-child(11) { animation-delay: 0.6s; }
+        .photo-card:nth-child(12) { animation-delay: 0.65s; }
+        .photo-card:nth-child(13) { animation-delay: 0.7s; }
+        .photo-card:nth-child(14) { animation-delay: 0.75s; }
+        .photo-card:nth-child(15) { animation-delay: 0.8s; }
+        .photo-card:nth-child(16) { animation-delay: 0.85s; }
+        .photo-card:nth-child(17) { animation-delay: 0.9s; }
+        .photo-card:nth-child(18) { animation-delay: 0.95s; }
+        .photo-card:nth-child(19) { animation-delay: 1s; }
+        .photo-card:nth-child(20) { animation-delay: 1.05s; }
+        .photo-card:nth-child(21) { animation-delay: 1.1s; }
+        .photo-card:nth-child(22) { animation-delay: 1.15s; }
+        .photo-card:nth-child(23) { animation-delay: 1.2s; }
+        .photo-card:nth-child(24) { animation-delay: 1.25s; }
+        .photo-card:nth-child(25) { animation-delay: 1.3s; }
+        .photo-card:nth-child(26) { animation-delay: 1.35s; }
+        .photo-card:nth-child(27) { animation-delay: 1.4s; }
+        .photo-card:nth-child(28) { animation-delay: 1.45s; }
+        .photo-card:nth-child(29) { animation-delay: 1.5s; }
+        .photo-card:nth-child(30) { animation-delay: 1.55s; }
+        .photo-card:nth-child(31) { animation-delay: 1.6s; }
+        .photo-card:hover {
+            transform: translateY(-15px) scale(1.05) rotateY(5deg);
+            z-index: 10;
+        }
+        .photo-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.3) 0%, rgba(254, 202, 87, 0.3) 50%, rgba(72, 219, 251, 0.3) 100%);
+            opacity: 0; transition: opacity 0.3s ease; z-index: 1;
+        }
+        .photo-card:hover::before { opacity: 1; }
+        .photo-card img {
+            width: 100%; height: 300px; object-fit: cover; display: block;
+            transition: transform 0.5s ease;
+        }
+        .photo-card:hover img { transform: scale(1.1); }
+        .photo-overlay {
+            position: absolute; bottom: 0; left: 0; right: 0; padding: 20px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            transform: translateY(100%); transition: transform 0.4s ease; z-index: 2;
+        }
+        .photo-card:hover .photo-overlay { transform: translateY(0); }
+        .photo-overlay span { color: white; font-size: 0.9rem; letter-spacing: 1px; }
+        .glow-border {
+            position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #ff6b6b);
+            background-size: 400% 400%; border-radius: 17px; z-index: -1;
+            animation: glow 3s ease infinite; opacity: 0; transition: opacity 0.3s ease;
+        }
+        @keyframes glow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .photo-card:hover .glow-border { opacity: 1; }
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2.5rem; }
+            .gallery { grid-template-columns: 1fr; }
+            .photo-card img { height: 250px; }
+        }
+        .lightbox {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95); z-index: 1000; justify-content: center; align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .lightbox.active { display: flex; }
+        .lightbox img {
+            max-width: 90%; max-height: 90%; border-radius: 10px;
+            box-shadow: 0 0 50px rgba(255, 107, 107, 0.3);
+            animation: zoomIn 0.3s ease;
+        }
+        @keyframes zoomIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .lightbox-close {
+            position: absolute; top: 30px; right: 30px; font-size: 40px;
+            color: white; cursor: pointer; transition: transform 0.3s ease;
+        }
+        .lightbox-close:hover { transform: rotate(90deg); }
+        .footer {
+            text-align: center; padding: 60px 20px; color: rgba(255, 255, 255, 0.5);
+            position: relative; z-index: 1;
+        }
+        .footer span { color: #ff6b6b; }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+
+    <div class="header">
+        <h1>✨ 红梅与贝 ✨</h1>
+        <p>记录每一个美好瞬间</p>
+    </div>
+
+    <div class="gallery-container">
+        <div class="gallery">
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="17226907856271722690748347-image.jpg" alt="照片1">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="IMG%2020240505%20112259.jpg" alt="照片2">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="IMG%2020240509%20093913.jpg" alt="照片3">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="IMG%2020241004%20153838.jpg" alt="照片4">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1708846188378.jpg" alt="照片5">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1714701390281.jpg" alt="照片6">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1714816510370.jpg" alt="照片7">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1714887805137.jpg" alt="照片8">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1714887810468.jpg" alt="照片9">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1716201929872.jpg" alt="照片10">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1716201938492.jpg" alt="照片11">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1720273503705.jpg" alt="照片12">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1720273509215.jpg" alt="照片13">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1720273535438.jpg" alt="照片14">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1728072871837.jpg" alt="照片15">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1728072893729.jpg" alt="照片16">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1728072895994.jpg" alt="照片17">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1728072914011.jpg" alt="照片18">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1728209345027.jpg" alt="照片19">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1728209347157.jpg" alt="照片20">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1728209349978(1).jpg" alt="照片21">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1728209349978.jpg" alt="照片22">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1728209352091.jpg" alt="照片23">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1728209487375.jpg" alt="照片24">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1728209510977.jpg" alt="照片25">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1728209524638.jpg" alt="照片26">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1728209604902.jpg" alt="照片27">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1728209618224.jpg" alt="照片28">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1728209711011.jpg" alt="照片29">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1728209725608.jpg" alt="照片30">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+            <div class="photo-card">
+                <div class="glow-border"></div>
+                <img src="mmexport1729164642362.jpg" alt="照片31">
+                <div class="photo-overlay"><span>📷 美好时刻</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="lightbox" id="lightbox">
+        <span class="lightbox-close" onclick="closeLightbox()">×</span>
+        <img src="" alt="大图" id="lightbox-img">
+    </div>
+
+    <div class="footer">
+        <p>用 <span>♥</span> 记录每一刻</p>
+    </div>
+
+    <script>
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 15 + 's';
+            particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            particlesContainer.appendChild(particle);
+        }
+
+        const photoCards = document.querySelectorAll('.photo-card img');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        photoCards.forEach(img => {
+            img.addEventListener('click', function() {
+                lightboxImg.src = this.src;
+                lightbox.classList.add('active');
+            });
+        });
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+        }
+
+        lightbox.addEventListener('click', function(e) {
+            if (e.target === lightbox) {
+                closeLightbox();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeLightbox();
+            }
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            const cards = document.querySelectorAll('.photo-card');
+            cards.forEach((card) => {
+                const rect = card.getBoundingClientRect();
+                const isHovered = e.clientX >= rect.left && e.clientX <= rect.right &&
+                                  e.clientY >= rect.top && e.clientY <= rect.bottom;
+                if (isHovered) {
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    const rotateX = (e.clientY - centerY) / 20;
+                    const rotateY = (centerX - e.clientX) / 20;
+                    card.style.transform = `translateY(-15px) scale(1.05) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
