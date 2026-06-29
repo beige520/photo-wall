@@ -200,6 +200,96 @@
             position: relative; z-index: 1;
         }
         .footer span { color: #ff6b6b; }
+
+        .music-control {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .music-control:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(255, 107, 107, 0.6);
+        }
+
+        .music-control.playing {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+            50% { box-shadow: 0 0 0 15px rgba(255, 107, 107, 0); }
+        }
+
+        .music-icon {
+            font-size: 24px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .music-bars {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 3px;
+            align-items: flex-end;
+        }
+
+        .music-bars .bar {
+            width: 4px;
+            background: white;
+            border-radius: 2px;
+            animation: none;
+        }
+
+        .music-control.playing .music-bars .bar {
+            animation: musicBars 0.8s ease-in-out infinite;
+        }
+
+        .music-control.playing .music-bars .bar:nth-child(1) {
+            height: 10px;
+            animation-delay: 0s;
+        }
+
+        .music-control.playing .music-bars .bar:nth-child(2) {
+            height: 15px;
+            animation-delay: 0.2s;
+        }
+
+        .music-control.playing .music-bars .bar:nth-child(3) {
+            height: 8px;
+            animation-delay: 0.4s;
+        }
+
+        @keyframes musicBars {
+            0%, 100% { height: 5px; }
+            50% { height: 15px; }
+        }
+
+        @media (max-width: 768px) {
+            .music-control {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+            }
+            .music-icon {
+                font-size: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -283,6 +373,20 @@
         <p>用 <span>♥</span> 记录每一刻</p>
     </div>
 
+    <audio id="bg-music" loop>
+        <source src="夏夜最后的烟火.mp3" type="audio/mpeg">
+        您的浏览器不支持音频播放。
+    </audio>
+
+    <div class="music-control" id="music-control" onclick="toggleMusic()">
+        <div class="music-icon">🎵</div>
+        <div class="music-bars">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+    </div>
+
     <script>
         const particlesContainer = document.getElementById('particles');
         for (let i = 0; i < 50; i++) {
@@ -336,6 +440,36 @@
                 }
             });
         });
+
+        // 音乐控制功能
+        const bgMusic = document.getElementById('bg-music');
+        const musicControl = document.getElementById('music-control');
+        const musicBars = document.querySelectorAll('.music-bars .bar');
+        let isPlaying = false;
+
+        function toggleMusic() {
+            if (isPlaying) {
+                bgMusic.pause();
+                musicControl.classList.remove('playing');
+                musicBars.forEach(bar => {
+                    bar.style.animationPlayState = 'paused';
+                });
+            } else {
+                bgMusic.play();
+                musicControl.classList.add('playing');
+                musicBars.forEach(bar => {
+                    bar.style.animationPlayState = 'running';
+                });
+            }
+            isPlaying = !isPlaying;
+        }
+
+        // 自动播放（需要用户交互后才能播放）
+        document.addEventListener('click', function() {
+            if (!isPlaying && !bgMusic.paused) {
+                isPlaying = true;
+            }
+        }, { once: true });
     </script>
 </body>
 </html>
