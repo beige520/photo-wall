@@ -1,6 +1,10 @@
 <div class="header">
     <h1>✨ 红梅与贝 ✨</h1>
     <p>记录每一个美好瞬间</p>
+    <div class="play-music-btn" id="play-music-btn" onclick="startMusic()">
+        <span class="play-icon">🎵</span>
+        <span class="play-text">点击播放音乐</span>
+    </div>
 </div>
 
 <div class="gallery-container">
@@ -34,9 +38,9 @@
         <div class="photo-card"><div class="glow-border"></div><img src="F316F0CA6C47EE0E33F9F0ADEDA0EE26.jpg" alt="照片"><div class="photo-overlay"><span>📷 美好时刻</span></div></div>
         <div class="photo-card"><div class="glow-border"></div><img src="F5BA97FE881D4813E3370239095FBF53.jpg" alt="照片"><div class="photo-overlay"><span>📷 美好时刻</span></div></div>
         <div class="photo-card"><div class="glow-border"></div><img src="F80E7BB7BD3044BFCC725D88DA90B28A.jpg" alt="照片"><div class="photo-overlay"><span>📷 美好时刻</span></div></div>
-        <div class="photo-card"><div class="glow-border"></div><img src="IMG%2020240505%20112259.jpg" alt="照片"><div class="photo-overlay"><span>📷 美好时刻</span></div></div>
-        <div class="photo-card"><div class="glow-border"></div><img src="IMG%2020240509%2009413.jpg" alt="照片"><div class="photo-overlay"><span>📷 美好时刻</span></div></div>
-        <div class="photo-card"><div class="glow-border"></div><img src="IMG%2020241004%20153838.jpg" alt="照片"><div class="photo-overlay"><span>📷 美好时刻</span></div></div>
+        <div class="photo-card"><div class="glow-border"></div><img src="IMG_20240505_112259.jpg" alt="照片"><div class="photo-overlay"><span>📷 美好时刻</span></div></div>
+        <div class="photo-card"><div class="glow-border"></div><img src="IMG_20240509_093913.jpg" alt="照片"><div class="photo-overlay"><span>📷 美好时刻</span></div></div>
+        <div class="photo-card"><div class="glow-border"></div><img src="IMG_20241004_153838.jpg" alt="照片"><div class="photo-overlay"><span>📷 美好时刻</span></div></div>
         <div class="photo-card"><div class="glow-border"></div><img src="mmexport1708846188378.jpg" alt="照片"><div class="photo-overlay"><span>📷 美好时刻</span></div></div>
         <div class="photo-card"><div class="glow-border"></div><img src="mmexport1714701390281.jpg" alt="照片"><div class="photo-overlay"><span>📷 美好时刻</span></div></div>
         <div class="photo-card"><div class="glow-border"></div><img src="mmexport1714816510370.jpg" alt="照片"><div class="photo-overlay"><span>📷 美好时刻</span></div></div>
@@ -76,57 +80,77 @@
     <p>用 <span>♥</span> 记录每一刻</p>
 </div>
 
+<audio id="bg-music" loop>
+    <source src="颜人中 - 夏夜最后的烟火.mp3" type="audio/mpeg">
+    您的浏览器不支持音频播放。
+</audio>
+
+<div class="music-control" id="music-control" onclick="toggleMusic()">
+    <span class="music-icon">🎵</span>
+    <div class="music-bars">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+    </div>
+</div>
+
 <script>
-    const particlesContainer = document.getElementById('particles');
-    for (let i = 0; i < 50; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.animationDelay = Math.random() * 15 + 's';
-        particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
-        particlesContainer.appendChild(particle);
+    const bgMusic = document.getElementById('bg-music');
+    const playMusicBtn = document.getElementById('play-music-btn');
+    const musicControl = document.getElementById('music-control');
+    let isPlaying = false;
+
+    function startMusic() {
+        bgMusic.play().then(() => {
+            isPlaying = true;
+            updateMusicUI();
+        }).catch(err => {
+            console.log('播放失败:', err);
+            alert('播放失败，请检查浏览器设置或尝试点击右下角音乐按钮');
+        });
     }
 
-    const photoCards = document.querySelectorAll('.photo-card img');
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightbox-img');
-
-    photoCards.forEach(img => {
-        img.addEventListener('click', function() {
-            lightboxImg.src = this.src;
-            lightbox.classList.add('active');
-        });
-    });
-
-    function closeLightbox() {
-        lightbox.classList.remove('active');
+    function toggleMusic() {
+        if (isPlaying) {
+            bgMusic.pause();
+            isPlaying = false;
+        } else {
+            bgMusic.play().then(() => {
+                isPlaying = true;
+            }).catch(err => {
+                console.log('播放失败:', err);
+                alert('播放失败，请检查浏览器设置');
+            });
+        }
+        updateMusicUI();
     }
 
-    lightbox.addEventListener('click', function(e) {
-        if (e.target === lightbox) {
-            closeLightbox();
+    function updateMusicUI() {
+        if (playMusicBtn) {
+            playMusicBtn.classList.toggle('playing', isPlaying);
+            playMusicBtn.querySelector('.play-text').textContent = isPlaying ? '音乐播放中' : '点击播放音乐';
         }
+        if (musicControl) {
+            musicControl.classList.toggle('playing', isPlaying);
+        }
+    }
+
+    document.addEventListener('click', function() {
+        if (!isPlaying && bgMusic.paused) {
+            bgMusic.play().then(() => {
+                isPlaying = true;
+                updateMusicUI();
+            }).catch(() => {});
+        }
+    }, { once: true });
+
+    bgMusic.addEventListener('ended', function() {
+        bgMusic.currentTime = 0;
+        bgMusic.play();
     });
 
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeLightbox();
-        }
-    });
-
-    document.addEventListener('mousemove', function(e) {
-        const cards = document.querySelectorAll('.photo-card');
-        cards.forEach((card) => {
-            const rect = card.getBoundingClientRect();
-            const isHovered = e.clientX >= rect.left && e.clientX <= rect.right &&
-                              e.clientY >= rect.top && e.clientY <= rect.bottom;
-            if (isHovered) {
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-                const rotateX = (e.clientY - centerY) / 20;
-                const rotateY = (centerX - e.clientX) / 20;
-                card.style.transform = `translateY(-15px) scale(1.05) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-            }
-        });
+    bgMusic.addEventListener('error', function(e) {
+        console.error('音频加载失败:', e);
+        alert('音乐文件加载失败，请检查文件路径是否正确');
     });
 </script>
