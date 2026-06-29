@@ -37,6 +37,42 @@
             margin-top: 15px;
             letter-spacing: 3px;
         }
+
+        .play-music-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 25px;
+            padding: 15px 35px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.4);
+            animation: bounce 2s infinite;
+        }
+
+        .play-music-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 30px rgba(255, 107, 107, 0.6);
+        }
+
+        .play-music-btn.playing {
+            background: linear-gradient(45deg, #48dbfb, #ff9ff3);
+            animation: none;
+        }
+
+        .play-icon {
+            font-size: 20px;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
         .particles {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -298,6 +334,10 @@
     <div class="header">
         <h1>✨ 红梅与贝 ✨</h1>
         <p>记录每一个美好瞬间</p>
+        <div class="play-music-btn" id="play-music-btn" onclick="startMusic()">
+            <span class="play-icon">🎵</span>
+            <span class="play-text">点击播放音乐</span>
+        </div>
     </div>
 
     <div class="gallery-container">
@@ -376,7 +416,7 @@
     <audio id="bg-music" loop>
         <source src="夏夜最后的烟火.mp3" type="audio/mpeg">
         您的浏览器不支持音频播放。
-    </audio>
+    </audio></audio>
 
     <div class="music-control" id="music-control" onclick="toggleMusic()">
         <div class="music-icon">🎵</div>
@@ -444,32 +484,48 @@
         // 音乐控制功能
         const bgMusic = document.getElementById('bg-music');
         const musicControl = document.getElementById('music-control');
+        const playMusicBtn = document.getElementById('play-music-btn');
         const musicBars = document.querySelectorAll('.music-bars .bar');
         let isPlaying = false;
+
+        function startMusic() {
+            if (!isPlaying) {
+                bgMusic.play().then(function() {
+                    isPlaying = true;
+                    playMusicBtn.classList.add('playing');
+                    playMusicBtn.innerHTML = '<span class="play-icon">🎵</span><span class="play-text">音乐播放中...</span>';
+                    if (musicControl) {
+                        musicControl.classList.add('playing');
+                        musicBars.forEach(bar => {
+                            bar.style.animationPlayState = 'running';
+                        });
+                    }
+                }).catch(function(e) {
+                    console.log('播放失败:', e);
+                    playMusicBtn.innerHTML = '<span class="play-icon">🎵</span><span class="play-text">播放失败，请重试</span>';
+                    setTimeout(function() {
+                        playMusicBtn.innerHTML = '<span class="play-icon">🎵</span><span class="play-text">点击播放音乐</span>';
+                    }, 2000);
+                });
+            }
+        }
 
         function toggleMusic() {
             if (isPlaying) {
                 bgMusic.pause();
-                musicControl.classList.remove('playing');
-                musicBars.forEach(bar => {
-                    bar.style.animationPlayState = 'paused';
-                });
+                isPlaying = false;
+                playMusicBtn.classList.remove('playing');
+                playMusicBtn.innerHTML = '<span class="play-icon">🎵</span><span class="play-text">点击播放音乐</span>';
             } else {
-                bgMusic.play();
-                musicControl.classList.add('playing');
+                startMusic();
+            }
+            if (musicControl) {
+                musicControl.classList.toggle('playing');
                 musicBars.forEach(bar => {
-                    bar.style.animationPlayState = 'running';
+                    bar.style.animationPlayState = isPlaying ? 'running' : 'paused';
                 });
             }
-            isPlaying = !isPlaying;
         }
-
-        // 自动播放（需要用户交互后才能播放）
-        document.addEventListener('click', function() {
-            if (!isPlaying && !bgMusic.paused) {
-                isPlaying = true;
-            }
-        }, { once: true });
     </script>
 </body>
 </html>
